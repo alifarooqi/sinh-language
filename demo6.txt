@@ -1,0 +1,5 @@
+type Person = {age : Int, ismale : Bool}
+
+function Int getAge (x : Person) {x.age}
+
+var john : Person = {age = 30, ismale = true}; @getAge(john)

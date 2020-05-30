@@ -1,0 +1,5 @@
+function Int divide (x : Int, y : Int) { x/y }
+
+function Bool isZero (x : Int) { if (x ==0) true; else false }
+
+var x : Int = 1; var y : Int = 0; try @divide(x,y) with @isZero(y)

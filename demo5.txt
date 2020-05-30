@@ -1,0 +1,2 @@
+type Person = {age : Int, ismale : Bool}
+var john : Person = {age = 30, ismale = true}; john.age

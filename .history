@@ -1,0 +1,62 @@
+:l demo9.txt 
+:l demo8.txt 
+:q
+:l demo9.txt
+:q
+:q
+:q
+:q
+:h
+:q
+:h
+:q
+var y : Bool = true; var x : Int = 3; x.head
+var y : Bool = true; var x : Int = 3; x + y
+var x : Int = 3; x + y
+1/0
+:
+1/0
+:q
+1/0
+:quit 
+var x : Int = 4; 4
+var x : Int = 4
+!1
+!true
+:quit 
+5/0
+true + true
+1+1
+1+true
+:quit 
+1+true
+:quit 
+1+true
+:quit 
+1+2
+:load
+:loadj
+qwe123
+:quit 
+var x : Int = 65;
+:load demo3.txt 
+:quit 
+var x : Int = 65; x+2
+var x = 65; x+2
+:quit
+:load demo3.txt 
+:load demo3.txt 
+:load demo2.txt 
+:load demo6.txt
+:load demo5.txt 
+1+4
+hello
+:quit
+load demo9.txt 
+:load demo9.txt 
+:load demo9.txt 
+:load demo9.txt 
+:load demo1.txt 
+:load demo.txt 
+500 + 300
+1+1
