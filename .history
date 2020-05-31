@@ -1,4 +1,84 @@
 :q
+var x : String = "Hello"; var y : Int = 100; x+y
+:l demo6.txt 
+var x : String = "Hello"; var y : String = "World"; y
+var x : String = "Hello"; var y : String = "World"; y
+var x : String = "Hello"; var y : String = "World"; y
+:q
+var x : String = "Hello"; var y : String = "World"; y
+var x : String = "Hello"; var y : String = "World"; y
+var x : String = "Hello"; var y : String = "World"; y
+:q
+var x : String = "Hello"; var y : String = "World"; y
+var x : String = "Hello"; var y : Int = 100; x+y
+false || true
+var x : String = "Hello "; var y : Int = 100; x+y
+var y : Int = 100; var x : String = "Hello "; x+y
+var x : String = "Hello "; var y : String = "World"; y
+:q
+var x : String = "Hello "; var y : String = "World"; y
+:q
+"He\"llo"
+var x : String = "Hello "; var y : String = "World"; y
+var x : String = "Hello "; var y : String = ""; y
+"asd" + 234
+"asd" + "asdw"
+var x : String = "Hello "; var y : String = ""; x+y
+var y : Int = 100; var x : String = "Hello "; x+y
+:q
+var y : Int = 100; var x : String = "Hello "; x+y
+var x : String = "Hello "; var y : Int = 100; x+y
+var x : String = "Hello "; var y : String = ""; x+y
+:q
+var x : String = "Hello "; var y : String = ""; x+y
+var x : String = "Hello "; var y : Int = 100; x+y
+:q
+var x : String = "Hello "; var y : Int = 100; x+y
+var x : String = "Hello "; var y : String = ""; x+y
+:q
+var x : String = "Hello "; var y : String = ""; x+y
+:q
+var x : String = "Hello "; var y : String = ""; x+y
+var x : String = "Hello "; var y : String = "100"; x+y
+var x : String = "Hello "; var y : Int = 100; x+y
+var x : String = "Hello "; var y : Int = 100; y + x
+:q
+var x : String = "Hello "; var y : Int = 100; y + x
+:q
+var x : String = "Hello "; var y : Int = 100; y + x
+var x : String = "Hello "; var y : Int = 100; y
+:q
+var x : String = "Hello "; var y : Int = 100; y
+var x : String = "Hello "; var y : Int = 100; x
+var x : String = "Hello "; var y : String = "World"; x
+:q
+var x : Int = 1; var y : Int = 4; x + y
+var x : Int = 1; var y : Int = 4; x
+var x : String = "Hello "; var y : String = "World"; x
+"He;llo" + "bachay"
+"He;llo bachay"
+"He;llo"
+var x : String = "Hello "; var y : String = "World"; x + "asd"
+var x : String = "Hello "; var y : String = "World"; x + y
+:q
+var x : String = "Hello "; var y : String = "World"; x + "asd"
+var x : String = "Hello "; var y : String = "World"; x + y
+var x : String = "Hello "; var y : String = "World"; x+y
+var x : String = "Hello "; x
+var x : String = ("Hello" + " World"); x
+var x : String = "Hello" + " World"; x
+:q
+var x : String = "Hello World"; x
+var x : String = "Hello World"; x
+:q
+var x : String = "Hello World"; x
+var x : string = "Hello World"; x
+:q
+var x : string = "Hello World"; x
+var x : Int = 10; x
+var x : String = "Hello World"; x
+var x = "Hello World"; x
+:q
 1 + 1 + (1//1)
 :q
 1 + 1 + (1//1)
@@ -18,81 +98,3 @@ var a=aasd
 var a=aasd
 var x = mutable 3;
 :q
-:q
-:q
-:q
-:q
-:q
-:q
-:q
-:q
-:q
-:q
-:q
-var c = ""
-qwe
-:q
-var asd asd
-asd
-:l demo9.txt 
-:l demo8.txt 
-:q
-:l demo9.txt
-:q
-:q
-:q
-:q
-:h
-:q
-:h
-:q
-var y : Bool = true; var x : Int = 3; x.head
-var y : Bool = true; var x : Int = 3; x + y
-var x : Int = 3; x + y
-1/0
-:
-1/0
-:q
-1/0
-:quit 
-var x : Int = 4; 4
-var x : Int = 4
-!1
-!true
-:quit 
-5/0
-true + true
-1+1
-1+true
-:quit 
-1+true
-:quit 
-1+true
-:quit 
-1+2
-:load
-:loadj
-qwe123
-:quit 
-var x : Int = 65;
-:load demo3.txt 
-:quit 
-var x : Int = 65; x+2
-var x = 65; x+2
-:quit
-:load demo3.txt 
-:load demo3.txt 
-:load demo2.txt 
-:load demo6.txt
-:load demo5.txt 
-1+4
-hello
-:quit
-load demo9.txt 
-:load demo9.txt 
-:load demo9.txt 
-:load demo9.txt 
-:load demo1.txt 
-:load demo.txt 
-500 + 300
-1+1

@@ -33,6 +33,7 @@ data Value
   | RcdV [(String, Value)]                 -- added
   | VarntV String Value Type               -- added
   | RaiseV Value                           -- added
+  | StringV String
   -- | IO(Value)
   deriving Eq
 
@@ -43,6 +44,7 @@ data Type
   | TRcd [(String,Type)]             -- added
   | TVarnt [(String,Type)]           -- added
   | TypDecl String                   -- added
+  | TString
   -- deriving Eq
 
 --data Declr = FunDecl (String, Function)
@@ -95,6 +97,7 @@ instance Show Type where
   show (TRcd xs)    = "{" ++ intercalate ", " (map (\(key, t) -> key ++ ": " ++ show t) xs) ++ "}"
   show (TVarnt xs)  = "<" ++ intercalate ", " (map (\(key, t) -> key ++ ": " ++ show t) xs) ++ ">"
   show (TypDecl str) = str
+  show (TString) = "String"
 
 instance Show Value where
   show (IntV n) = show n
@@ -109,6 +112,7 @@ instance Show Value where
       (IntV 1) -> "Function not declared!" -- Redundant: Chacked during typecheck
       (IntV 2) -> "Variable not declared!" -- Redundant: Chacked during typecheck
       (IntV 3) -> "Record not declared!"   -- Redundant: Chacked during typecheck
+  show (StringV str) = str
 
 instance Eq Type where
   TInt == TInt = True
@@ -117,6 +121,7 @@ instance Eq Type where
   TRcd a == TRcd b = a == b
   TVarnt a == TVarnt b = not $ null $ intersect a b
   TypDecl a == TypDecl b = a == b
+  TString == TString = True
   _ == _ = False
 
 -- | Examples:

@@ -24,6 +24,7 @@ tokens :-
   type                          { \s -> TokenType }
   \|                            { \s -> TokenBar }
   $digit+                       { \s -> TokenInt (read s) }
+  \".*\"                        { \s -> TokenString (read s) }
   \;                            { \s -> TokenSemiColon }
   \=                            { \s -> TokenEq }
   \+                            { \s -> TokenPlus }
@@ -49,16 +50,19 @@ tokens :-
   \-\>                          { \s -> TokenArrow }
   function                      { \s -> TokenFunc }
   Int                           { \s -> TokenTInt }
+  String                        { \s -> TokenTString }
   Bool                          { \s -> TokenTBool }
   $alpha [$alpha $digit \_ \']* { \s -> TokenSym s }
   \@                            { \s -> TokenTopLevelFun }
   \.                            { \s -> TokenDot }
+  
 
 
 
 {
 -- The token type:
 data Token = TokenInt Int
+           | TokenString String
            | TokenSym String
            | TokenVar
            | TokenIf
@@ -89,6 +93,7 @@ data Token = TokenInt Int
            | TokenFunc
            | TokenTInt
            | TokenTBool
+           | TokenTString
            | TokenArrow
            | TokenTopLevelFun
            | TokenCase

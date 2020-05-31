@@ -11,6 +11,9 @@ unary Neg (IntV i)  = IntV (-i)
 
 binary :: BinaryOp -> Value -> Value -> Maybe Value
 binary Add (IntV a) (IntV b) = Just $ IntV (a + b)
+binary Add (StringV a) (StringV b) = Just $ StringV (a ++ b)
+binary Add (StringV a) (IntV b) = Just $ StringV (a ++ show b)
+binary Add (IntV a) (StringV b) = Just $ StringV (show a ++ b)
 binary Sub (IntV a) (IntV b) = Just $ IntV (a - b)
 binary Mult (IntV a) (IntV b) = Just $ IntV (a * b)
 binary Div (IntV a) (IntV b) = if (b == 0) then Nothing else Just $ IntV (a `div` b)

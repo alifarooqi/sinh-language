@@ -16,8 +16,10 @@ import Tokens
     var     { TokenVar }
     id      { TokenSym $$ }
     int     { TokenInt $$ }
+    string  { TokenString $$ }
     Int     { TokenTInt }
     Bool    { TokenTBool }
+    String  { TokenTString }
     case    { TokenCase }
     of      { TokenOf }
     raise   { TokenRaise }
@@ -85,6 +87,7 @@ ids : ids ',' id ':' typ    { $1 ++ [($3, $5)] }
 
 typ : Int           { TInt }
     | Bool          { TBool }
+    | String        { TString }
     | typ '->' typ  { TFun $1 $3 }
     | '{' tRcds '}'  { TRcd $2 }
     | '<' tRcds '>'  { TVarnt $2 }
@@ -138,6 +141,7 @@ App : App '(' Exp ')'                    { CallFC $1 $3 }
     | int                                { Lit (IntV $1) }
     | true                               { Lit (BoolV True) }
     | false                              { Lit (BoolV False) }
+    | string                             { Lit (StringV $1) }
     | id                                 { Var $1}
 
 Exps : Exps ',' Exp                   { $1 ++ [$3] }

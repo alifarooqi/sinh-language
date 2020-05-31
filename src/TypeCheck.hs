@@ -18,6 +18,9 @@ tunary Not t = Left $ "Type Error: Wrong type used with Not Operator\nExpected B
 
 tbinary :: BinaryOp -> Type -> Type -> Either String Type
 tbinary Add TInt  TInt  = Right TInt
+tbinary Add TString  TString = Right TString
+tbinary Add TString  TInt = Right TString
+tbinary Add TInt  TString = Right TString
 tbinary Sub TInt  TInt  = Right TInt
 tbinary Mult TInt TInt  = Right TInt
 tbinary Div TInt  TInt  = Right TInt
@@ -29,7 +32,7 @@ tbinary GE  TInt  TInt  = Right TBool
 tbinary GT  TInt  TInt  = Right TBool
 tbinary EQ  t1    t2    | t1 == t2 = Right TBool
 -- Custom Error Messages
-tbinary Add t1  t2  = Left $ "Type Error: Wrong type used with Addition Operator.\nExpected Int and Int, got " ++ show t1 ++ " and " ++ show t2
+tbinary Add t1  t2  = Left $ "Type Error: Wrong type used with Addition Operator.\nCannot add " ++ show t1 ++ " and " ++ show t2
 tbinary Sub t1  t2  = Left $ "Type Error: Wrong type used with Subtraction Operator.\nExpected Int and Int, got " ++ show t1 ++ " and " ++ show t2
 tbinary Mult t1 t2  = Left $ "Type Error: Wrong type used with Multiplication Operator.\nExpected Int and Int, got " ++ show t1 ++ " and " ++ show t2
 tbinary Div t1  t2  = Left $ "Type Error: Wrong type used with Division Operator.\nExpected Int and Int, got " ++ show t1 ++ " and " ++ show t2
@@ -148,6 +151,7 @@ tcheck typeEnv (Lit v) _ _ =
   case v of
     IntV _ -> Right TInt
     BoolV _ -> Right TBool
+    StringV _ -> Right TString
 
 tcheck typeEnv (Unary op e) tenv fenv =
   case tcheck typeEnv e tenv fenv of
@@ -173,21 +177,27 @@ tcheck typeEnv (If e1 e2 e3) tenv fenv =
     err -> err
     
 
-tcheck typeEnv (Var v) tenv _ = case lookup v tenv of
+tcheck typeEnv (Var v) tenv _ = case lookup v (trace (debug $ "Env: " ++ show tenv) tenv) of
   Just t -> Right t
   Nothing -> Left $ "Variable " ++ v ++ " is not declared"
 
 tcheck typeEnv (Decl v t e1 e2) tenv fenv =
-  case t of
+  case (trace (debug $ "Var Decl: " ++ v ++ " : " ++ show t) t) of
     (TypDecl str) -> (do
       case lookup str typeEnv of
         Just t2 -> tcheck typeEnv (Decl v t2 e1 e2) tenv fenv
         Nothing -> Left $ "Type " ++ str ++ " has not been declared")
     _              -> do t1 <- tcheck typeEnv e1 tenv fenv
                          tcheck typeEnv e2 ((v, t) : tenv) fenv
-
+ 
 
 checkProgram :: Program -> Either String Type
 checkProgram (Program typeEnv fds main) = do
   fenv <- checkFunEnv typeEnv fds
   tcheck typeEnv main [] fenv
+
+
+
+
+
+
