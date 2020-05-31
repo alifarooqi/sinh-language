@@ -2,7 +2,7 @@ module Main where
 
 import Prelude hiding (LT, GT, EQ)
 import Declare
-import Parser
+import Parser 
 import Interp
 import TypeCheck
 
@@ -20,18 +20,24 @@ version = "1.0.0"
 hoistErr :: String -> Repl ()
 hoistErr str = liftIO $ putStrLn $ red ++ str ++ colorReset
 
+hoistErr2 :: String -> IO ()
+hoistErr2 str = putStrLn $ red ++ str ++ colorReset
+
 
 -- Execution
 exec :: String -> Repl ()
 exec src = do
   let ast = parseExpr src
-  case checkProgram ast of
-    Right t -> (do
-      let value = execute ast
-      case value of
-        (RaiseV v) -> hoistErr $ show (RaiseV v)
-        _ -> liftIO $ putStrLn $ show value)
-    Left err -> hoistErr err
+  case ast of
+    (Ok a) -> case checkProgram a of
+                Right t -> (do
+                  let value = execute a
+                  case value of
+                    (RaiseV v) -> hoistErr $ show (RaiseV v)
+                    _ -> liftIO $ putStrLn $ show value)
+                Left err -> hoistErr err
+
+    (Failed e) -> hoistErr e
 
 
 -- Directly Execute program file without loading the shell
@@ -39,14 +45,16 @@ load2 :: String -> IO ()
 load2 fname = do
   src <- liftIO $ readFile fname
   let ast = parseExpr src
-  case checkProgram ast of
-    Right t -> (do
-      let value = execute ast
-      case value of
-        (RaiseV v) -> putStrLn $ red ++ show (RaiseV v) ++ colorReset
-        _ -> putStrLn $ show value)
-    Left err -> putStrLn $ red ++ err ++ colorReset
+  case ast of
+    (Ok a) -> case checkProgram a of
+                Right t -> (do
+                  let value = execute a
+                  case value of
+                    (RaiseV v) -> hoistErr2 $ show (RaiseV v)
+                    _ -> putStrLn $ show value)
+                Left err -> hoistErr2 err
 
+    (Failed e) -> hoistErr2 e
 
 -- Commands
 
