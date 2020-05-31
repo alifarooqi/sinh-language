@@ -2,8 +2,8 @@ module TypeCheck where
 
 import Declare
 import Prelude hiding (LT, GT, EQ)
--- import Data.Maybe (fromJust
 import Data.Either(rights, lefts)
+import Debug.Trace (trace)
 
 type TEnv = [(String,Type)]
 
@@ -47,7 +47,7 @@ tbinary _ _ _ = Left "Type Error: Wrong type used with Binary Operator" -- Redun
 substituteType :: (String, Type) -> TypeEnv -> Either String (String, Type)
 substituteType (name, (TypDecl str)) typeEnv = case lookup str typeEnv of
   Just t -> Right (name, t)
-  Nothing -> Left $ "Undeclared type: " ++ str -- TODO
+  Nothing -> Left $ "Undeclared type: " ++ str
 substituteType a _ = Right a
 
 checkFunEnv :: TypeEnv -> FunEnv -> Either String TFunEnv
@@ -68,27 +68,42 @@ checkFunEnv typeEnv fds = checkFunEnv1 fds [] -- starts with an empty function t
 
 
 tcheck :: TypeEnv -> Exp -> TEnv -> TFunEnv -> Either String Type
+
 tcheck typeEnv (Try exp1 exp2) env fenv = case tcheck typeEnv exp1 env fenv of
   (Right t) -> (Right t)
   Left _ -> tcheck typeEnv exp2 env fenv
+
 tcheck typeEnv (Raise exp) env fenv = tcheck typeEnv exp env fenv
+
 tcheck typeEnv (CaseV exp caseList) env fenv = do
       t1 <- tcheck typeEnv exp env fenv
       matchCaseType t1 caseList Nothing
       where
         matchCaseType :: Type -> [(String, String, Exp)] -> Maybe Type -> Either String Type
         matchCaseType _ [] (Just t) = Right t
-        matchCaseType _ [] Nothing = Left "Type Error: Incosistant expression types in Case Variant"
+        matchCaseType _ [] Nothing = Left "Type Error: No case in the Case Variant"
         matchCaseType t1 ((label, varName, e) : xxs) t = do
-          t2 <- tcheck typeEnv e ((varName, t1) : env) fenv
-          if t == Nothing || t == (Just t2) then
-            matchCaseType t1 xxs (Just t2)
-          else
-            Left "Type Error: Incosistant expression types in Case Variant"
+          case t1 of
+            (TVarnt variantTypeList) -> (do
+              case lookup label variantTypeList of
+                Just t3 -> (do
+                  t2 <- tcheck typeEnv e ((varName, t3) : env) fenv
+                  if t == Nothing || t == (Just t2) then
+                    matchCaseType t1 xxs (Just t2)
+                  else
+                    Left "Type Error: Incosistant expression types in Case Variant")
+                Nothing -> matchCaseType t1 xxs t)
+            _ -> Left "Type Error: Variant not used in case analysis"
+
+-- tcheck typeEnv (CaseV exp caseList) env fenv = do
+--   t1 <- tcheck typeEnv exp env fenv
+--   case t1 of
+--     (TVarnt variantTypeList) -> tcheck typeEnv e ((varName, t3) : env) fenv
+--     _ -> Left "Type Error: Variant not used in case analysis"
 
 tcheck typeEnv (Varnt str exp t) env fenv = do
   t1 <- tcheck typeEnv exp env fenv
-  if t == t1 then Right t1 
+  if t == t1 then Right (TVarnt [(str, t)]) 
   else Left $ "Type Error: Types in variant " ++ show str ++ " do not match."
     
 tcheck typeEnv (RcdProj exp str) env fenv = do
@@ -99,7 +114,6 @@ tcheck typeEnv (RcdProj exp str) env fenv = do
       _ -> Left $ "Record has no attribute " ++ show str
     te -> Left $ "Type Error: Projection seems to be done a variable of type " ++ show te
 
--- tcheck typeEnv (Rcd xs) env fenv = Right (TRcd $ map (\(key, exp) -> (key, fromJust (tcheck typeEnv exp env fenv))) xs)
 tcheck typeEnv (Rcd xs) env fenv = do
   let xxs = checkRcd xs
   let n = lefts xxs
@@ -140,7 +154,7 @@ tcheck typeEnv (Call name args) tenv fenv =
       -- check if types of arguments match the types of parameters
       if map (Right . snd) paras == map (\e -> tcheck typeEnv e tenv fenv) args
         then Right t
-        else Left ""
+        else Left $ "Type Error: Parameter type and expression don't match in function call " ++ show (Call name args)
 
 tcheck typeEnv (Lit v) _ _ =
   case v of
@@ -179,11 +193,17 @@ tcheck typeEnv (Decl v t e1 e2) tenv fenv =
   case t of
     (TypDecl str) -> (do
       case lookup str typeEnv of
-        Just t2 -> tcheck typeEnv e2 ((v, t2) : tenv) fenv
+        Just t2 -> tcheck typeEnv (Decl v t2 e1 e2) tenv fenv
         Nothing -> Left $ "Type " ++ str ++ " has not been declared")
-    _              -> case tcheck typeEnv e1 tenv fenv of
-                        Right t1  -> tcheck typeEnv e2 ((v, t1) : tenv) fenv
-                        err  -> err
+    _              -> do t1 <- tcheck typeEnv e1 tenv fenv
+                         tcheck typeEnv e2 ((v, t) : tenv) fenv
+
+-- tcheck typeEnv (Decl v t e1 e2) tenv fenv =
+--   case t of
+--     (TypDecl str) -> tcheck typeEnv e2 ((v, t) : tenv) fenv
+--     _              -> case tcheck typeEnv e1 tenv fenv of
+--                         Right t1  -> tcheck typeEnv e2 ((v, t1) : tenv) fenv
+--                         err  -> err
 
 
 checkProgram :: Program -> Either String Type

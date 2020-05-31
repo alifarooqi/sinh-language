@@ -15,11 +15,6 @@ import Control.Monad.State.Strict
 
 type Repl a = HaskelineT IO a
 
--- Colors
-colorReset = "\x1b[0m"
-red = "\x1b[31m"
-yellow = "\x1b[33m"
-
 version = "1.0.0"
 
 hoistErr :: String -> Repl ()
@@ -38,6 +33,21 @@ exec src = do
         _ -> liftIO $ putStrLn $ show value)
     Left err -> hoistErr err
 
+
+-- Directly Execute program file without loading the shell
+load2 :: String -> IO ()
+load2 fname = do
+  src <- liftIO $ readFile fname
+  let ast = parseExpr src
+  case checkProgram ast of
+    Right t -> (do
+      let value = execute ast
+      case value of
+        (RaiseV v) -> putStrLn $ red ++ show (RaiseV v) ++ colorReset
+        _ -> putStrLn $ show value)
+    Left err -> putStrLn $ red ++ err ++ colorReset
+
+
 -- Commands
 
 -- :load command
@@ -49,7 +59,9 @@ load args = do
 
 -- :quit command
 quit :: a -> Repl ()
-quit _ = liftIO $ exitSuccess
+quit _ = do
+  liftIO $ putStrLn "Leaving SINH..."
+  liftIO $ exitSuccess
 
 -- :help command
 help :: a -> Repl ()
@@ -102,7 +114,7 @@ main = do
   args <- getArgs
   case args of
     [] -> shell (ini)
-    [fname] -> shell (load [fname])
+    [fname] -> load2 fname
     _ -> do
       putStrLn $ yellow ++ "Invalid arguments! Proper use:" ++ colorReset
       putStrLn "\t\t<stack build> sinh <filename>"

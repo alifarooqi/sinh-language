@@ -1,8 +1,18 @@
 module Declare where
 
 import Data.Maybe (fromJust)
-import Data.List (intercalate)
+import Data.List (intercalate, intersect)
 import Prelude hiding (LT, GT, EQ)
+
+-- import Debug.Trace (trace)
+
+-- Colors
+colorReset = "\x1b[0m"
+debugColor = "\x1b[36m"
+red = "\x1b[31m"
+yellow = "\x1b[33m"
+
+debug p = (debugColor ++ "Debug: " ++ show p ++ colorReset)
 
 data BinaryOp = Add | Sub | Mult | Div
               | And | Or  | GT   | LT  | LE
@@ -23,7 +33,7 @@ data Value
   | RcdV [(String, Value)]                 -- added
   | VarntV String Value Type               -- added
   | RaiseV Value                           -- added
-  | IO(Value)
+  -- | IO(Value)
   deriving Eq
 
 data Type
@@ -33,7 +43,7 @@ data Type
   | TRcd [(String,Type)]             -- added
   | TVarnt [(String,Type)]           -- added
   | TypDecl String                   -- added
-  deriving Eq
+  -- deriving Eq
 
 --data Declr = FunDecl (String, Function)
 --           | TypDecl (String, Type)
@@ -99,6 +109,15 @@ instance Show Value where
       (IntV 1) -> "Function not declared!" -- Redundant: Chacked during typecheck
       (IntV 2) -> "Variable not declared!" -- Redundant: Chacked during typecheck
       (IntV 3) -> "Record not declared!"   -- Redundant: Chacked during typecheck
+
+instance Eq Type where
+  TInt == TInt = True
+  TBool == TBool = True
+  TFun a1 b1 == TFun a2 b2 = a1 == a2 && b1 == b2
+  TRcd a == TRcd b = a == b
+  TVarnt a == TVarnt b = not $ null $ intersect a b
+  TypDecl a == TypDecl b = a == b
+  _ == _ = False
 
 -- | Examples:
 --
