@@ -177,27 +177,21 @@ tcheck typeEnv (If e1 e2 e3) tenv fenv =
     err -> err
     
 
-tcheck typeEnv (Var v) tenv _ = case lookup v (trace (debug $ "Env: " ++ show tenv) tenv) of
+tcheck typeEnv (Var v) tenv _ = case lookup v tenv of
   Just t -> Right t
   Nothing -> Left $ "Variable " ++ v ++ " is not declared"
 
 tcheck typeEnv (Decl v t e1 e2) tenv fenv =
-  case (trace (debug $ "Var Decl: " ++ v ++ " : " ++ show t) t) of
+  case t of
     (TypDecl str) -> (do
       case lookup str typeEnv of
         Just t2 -> tcheck typeEnv (Decl v t2 e1 e2) tenv fenv
         Nothing -> Left $ "Type " ++ str ++ " has not been declared")
     _              -> do t1 <- tcheck typeEnv e1 tenv fenv
                          tcheck typeEnv e2 ((v, t) : tenv) fenv
- 
+
 
 checkProgram :: Program -> Either String Type
 checkProgram (Program typeEnv fds main) = do
   fenv <- checkFunEnv typeEnv fds
   tcheck typeEnv main [] fenv
-
-
-
-
-
-
