@@ -95,12 +95,6 @@ tcheck typeEnv (CaseV exp caseList) env fenv = do
                 Nothing -> matchCaseType t1 xxs t)
             _ -> Left "Type Error: Variant not used in case analysis"
 
--- tcheck typeEnv (CaseV exp caseList) env fenv = do
---   t1 <- tcheck typeEnv exp env fenv
---   case t1 of
---     (TVarnt variantTypeList) -> tcheck typeEnv e ((varName, t3) : env) fenv
---     _ -> Left "Type Error: Variant not used in case analysis"
-
 tcheck typeEnv (Varnt str exp t) env fenv = do
   t1 <- tcheck typeEnv exp env fenv
   if t == t1 then Right (TVarnt [(str, t)]) 
@@ -132,12 +126,6 @@ tcheck typeEnv (Rcd xs) env fenv = do
 tcheck typeEnv (Fun (x, t1) e) env fenv = do
   t2 <- tcheck typeEnv e ((x, t1) : env) fenv 
   Right (TFun t1 t2)
-
--- tcheck typeEnv (CallFC e1 e2) env fenv =
---   case (tcheck typeEnv e1 env fenv, tcheck typeEnv e2 env fenv) of
---     (Right (TFun t1 t2), Right t3)
---       | t1 == t3 -> Right t2
---     _ -> Left "Errpr"
 
 tcheck typeEnv (CallFC e1 e2) env fenv = do
   t <- tcheck typeEnv e1 env fenv
@@ -197,13 +185,6 @@ tcheck typeEnv (Decl v t e1 e2) tenv fenv =
         Nothing -> Left $ "Type " ++ str ++ " has not been declared")
     _              -> do t1 <- tcheck typeEnv e1 tenv fenv
                          tcheck typeEnv e2 ((v, t) : tenv) fenv
-
--- tcheck typeEnv (Decl v t e1 e2) tenv fenv =
---   case t of
---     (TypDecl str) -> tcheck typeEnv e2 ((v, t) : tenv) fenv
---     _              -> case tcheck typeEnv e1 tenv fenv of
---                         Right t1  -> tcheck typeEnv e2 ((v, t1) : tenv) fenv
---                         err  -> err
 
 
 checkProgram :: Program -> Either String Type
