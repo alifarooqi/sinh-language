@@ -1,5 +1,0 @@
-type Person = {name: String, age : Int, ismale : Bool}
-
-function Int getAge (x : Person) {x.age}
-
-var john : Person = {name: "Ali", age = 30, ismale = true}; @getAge(john)

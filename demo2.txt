@@ -1,2 +1,0 @@
-function Int getAge (x : {age : Int, ismale : Bool}) {x.age}
-var john : {age : Int, ismale : Bool} = {age = 21, ismale = true}; @getAge(john)

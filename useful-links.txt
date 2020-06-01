@@ -1,2 +1,0 @@
-https://github.com/davidpeterko/CS345/blob/master/HW%238/CheckedStatefulMonad.hs
-https://github.com/Mdelvalle/CS345-Programming-Languages
