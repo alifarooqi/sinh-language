@@ -25,6 +25,7 @@ tokens :-
   \|                            { \s -> TokenBar }
   $digit+                       { \s -> TokenInt (read s) }
   \".*\"                        { \s -> TokenString (read s) }
+  \<\-                          { \s -> TokenAssign }
   \;                            { \s -> TokenSemiColon }
   \=                            { \s -> TokenEq }
   \+                            { \s -> TokenPlus }
@@ -49,12 +50,14 @@ tokens :-
   \:                            { \s -> TokenColon }
   \-\>                          { \s -> TokenArrow }
   function                      { \s -> TokenFunc }
+  mutable                       { \s -> TokenMut }
   Int                           { \s -> TokenTInt }
   String                        { \s -> TokenTString }
   Bool                          { \s -> TokenTBool }
   $alpha [$alpha $digit \_ \']* { \s -> TokenSym s }
   \@                            { \s -> TokenTopLevelFun }
   \.                            { \s -> TokenDot }
+  \$                            { \s -> TokenAt }
   
 
 
@@ -105,6 +108,9 @@ data Token = TokenInt Int
            | TokenWith
            | TokenDot
            | TokenType
+           | TokenAt
+           | TokenMut
+           | TokenAssign
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens

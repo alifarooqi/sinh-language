@@ -1,4 +1,43 @@
 :q
+:l demo9.txt 
+:q
+:l demo9.txt 
+:q
+:l demo9.txt 
+:q
+:l demo9.txt 
+:l demo9.txt 
+:q
+:
+1+"asd"
+1+1
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+:l demo9.txt 
+x <- 100
+x = 100
+var x : Int = mutable 50; x
+:q
+var x : Int = mut 50; x
+var x : Int = mutable 50; x
+var x : mutable Int = 50; x
+var x : String = "Hello "; var y : String = "World";  x
+:q
+hae
+var x : String = "Hello"; var y : String = "World"; y
+var x : String = "Hello"; var y : Int = 100; x+y
+:q
 var x : String = "Hello"; var y : Int = 100; x+y
 :l demo6.txt 
 var x : String = "Hello"; var y : String = "World"; y
@@ -59,42 +98,3 @@ var x : String = "Hello "; var y : String = "World"; x
 "He;llo bachay"
 "He;llo"
 var x : String = "Hello "; var y : String = "World"; x + "asd"
-var x : String = "Hello "; var y : String = "World"; x + y
-:q
-var x : String = "Hello "; var y : String = "World"; x + "asd"
-var x : String = "Hello "; var y : String = "World"; x + y
-var x : String = "Hello "; var y : String = "World"; x+y
-var x : String = "Hello "; x
-var x : String = ("Hello" + " World"); x
-var x : String = "Hello" + " World"; x
-:q
-var x : String = "Hello World"; x
-var x : String = "Hello World"; x
-:q
-var x : String = "Hello World"; x
-var x : string = "Hello World"; x
-:q
-var x : string = "Hello World"; x
-var x : Int = 10; x
-var x : String = "Hello World"; x
-var x = "Hello World"; x
-:q
-1 + 1 + (1//1)
-:q
-1 + 1 + (1//1)
-1 + 1 + (1)
-1 + true1
-1 + true
-1 + tru
-var a = bala
-:q
-var a = bala
-:q
-var a = bala
-:q
-LLoool
-var a = bala
-var a=aasd
-var a=aasd
-var x = mutable 3;
-:q

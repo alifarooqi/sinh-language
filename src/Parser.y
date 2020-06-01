@@ -26,6 +26,7 @@ import Tokens
     try     { TokenTry }
     with    { TokenWith }
     type    { TokenType }
+    '<-'    { TokenAssign }
     '|'     { TokenBar }
     '+'     { TokenPlus }
     '-'     { TokenMinus }
@@ -53,9 +54,12 @@ import Tokens
     '!'     { TokenNot }
     '||'    { TokenOr }
     fun     { TokenFunc }
+    mut     { TokenMut }
     '->'    { TokenArrow }
     '@'     {TokenTopLevelFun}
     '.'     { TokenDot }
+    '$'     { TokenAt }
+    
 
 %right ';' else
 %left '||'
@@ -64,7 +68,7 @@ import Tokens
 %nonassoc '>' '<' '>=' '<='
 %left '+' '-'
 %left '*' '/'
-%left NEG NOT
+%left NEG NOT AT MUTA
 %right '->'
 
 %%
@@ -99,30 +103,34 @@ tRcds: tRcds tRcd1  { $1 ++ [$2] }
 tRcd1 : id ':' typ       { ($1, $3) }
       | id ':' typ ','   { ($1, $3) }
 
-Exp : fun '(' id ':' typ ')' '{' Exp '}' { Fun ($3, $5) $8 }
-    | var id ':' typ '=' Exp ';' Exp     { Decl $2 $4 $6 $8 }
-    | if '(' Exp ')' Exp ';' else Exp { If $3 $5 $8 }
-    | Exp '||' Exp                    { Bin Or $1 $3 }
-    | Exp '&&' Exp                    { Bin And $1 $3 }
-    | Exp '==' Exp                    { Bin EQ $1 $3 }
-    | Exp '<' Exp                     { Bin LT $1 $3 }
-    | Exp '>' Exp                     { Bin GT $1 $3 }
-    | Exp '<=' Exp                    { Bin LE $1 $3 }
-    | Exp '>=' Exp                    { Bin GE $1 $3 }
-    | Exp '+' Exp                     { Bin Add $1 $3 }
-    | Exp '-' Exp                     { Bin Sub $1 $3 }
-    | Exp '*' Exp                     { Bin Mult $1 $3 }
-    | Exp '/' Exp                     { Bin Div $1 $3 }
-    | '-' Exp %prec NEG               { Unary Neg $2 }
-    | '!' Exp %prec NOT               { Unary Not $2 }
-    | '@' id '(' Exps ')'             { Call $2 $4 }
-    | '{' Rcds '}'                    { Rcd $2 }
-    | Exp '.' id                      { RcdProj $1 $3 }
-    | '<' id '=' Exp ':' typ '>'      { Varnt $2 $4 $6 }
-    | App                             { $1 }
-    | case Exp of Cases               { CaseV $2 $4 }
-    | raise Exp                       { Raise $2 }
-    | try Exp with Exp                { Try $2 $4 }
+Exp : fun '(' id ':' typ ')' '{' Exp '}'   { Fun ($3, $5) $8 }
+    | var id ':' typ '=' Exp ';' Exp       { Decl $2 $4 $6 $8 }
+--    | Exp ';' Exp                          { Seq $1 $3 }
+    | id '<-' Exp ';' Exp                  { Assign (Var $1) $3 $5 }
+    | if '(' Exp ')' Exp ';' else Exp      { If $3 $5 $8 }
+    | Exp '||' Exp                         { Bin Or $1 $3 }
+    | Exp '&&' Exp                         { Bin And $1 $3 }
+    | Exp '==' Exp                         { Bin EQ $1 $3 }
+    | Exp '<' Exp                          { Bin LT $1 $3 }
+    | Exp '>' Exp                          { Bin GT $1 $3 }
+    | Exp '<=' Exp                         { Bin LE $1 $3 }
+    | Exp '>=' Exp                         { Bin GE $1 $3 }
+    | Exp '+' Exp                          { Bin Add $1 $3 }
+    | Exp '-' Exp                          { Bin Sub $1 $3 }
+    | Exp '*' Exp                          { Bin Mult $1 $3 }
+    | Exp '/' Exp                          { Bin Div $1 $3 }
+    | '-' Exp %prec NEG                    { Unary Neg $2 }
+    | '!' Exp %prec NOT                    { Unary Not $2 }
+    | '@' id '(' Exps ')'                  { Call $2 $4 }
+    | '{' Rcds '}'                         { Rcd $2 }
+    | Exp '.' id                           { RcdProj $1 $3 }
+    | '<' id '=' Exp ':' typ '>'           { Varnt $2 $4 $6 }
+    | App                                  { $1 }
+    | case Exp of Cases                    { CaseV $2 $4 }
+    | raise Exp                            { Raise $2 }
+    | try Exp with Exp                     { Try $2 $4 }
+    | '$' Exp %prec AT                     { Access $2 }
+    | mut Exp %prec MUTA                   { Mutable $2 }
 
 Cases: Cases Cases1 { $1 ++ [$2] }
      | {- empty -}    { [] }
