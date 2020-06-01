@@ -136,16 +136,16 @@ tcheck typeEnv (CallFC e1 e2) env fenv = do
   case t of
     (TFun t1 t2)
       | t1 == t3 -> Right t2
-    _ -> Left $ "Type Error: Unexpected error at " ++ show (CallFC e1 e2)
+    _ -> Left $ "Type Error: Unexpected parameter type at " ++ show (CallFC e1 e2)
 
 tcheck typeEnv (Call name args) tenv fenv =
   case lookup name fenv of
-    Nothing -> Left $ "Undeclared function call at " ++ show (Call name args)
     Just (paras, t) ->
       -- check if types of arguments match the types of parameters
       if map (Right . snd) paras == map (\e -> tcheck typeEnv e tenv fenv) args
         then Right t
         else Left $ "Type Error: Parameter type and expression don't match in function call " ++ show (Call name args)
+    Nothing -> tcheck typeEnv (CallFC (Var name) (args !! 0)) tenv fenv
 
 tcheck typeEnv (Lit v) _ _ =
   case v of

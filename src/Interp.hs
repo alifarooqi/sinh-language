@@ -73,9 +73,7 @@ evaluate e env fenv = evalState [] $ eval e env
       case v of
         (RcdV record) -> case (lookup str record) of
                             Just v -> return (v)
-                            Nothing -> return (RaiseV (IntV 3))
-
-                                
+                            Nothing -> return (RaiseV (IntV 3))                        
 
     -- eval (Rcd xs) env = return (RcdV $ map (\(key, exp) -> (key, (eval exp env))) xs)
     eval (Rcd xs) env = evaluateRcd xs []
@@ -96,7 +94,7 @@ evaluate e env fenv = evalState [] $ eval e env
           eval body ((name, argV) : env')
 
     eval (Call fun args) env = 
-      case (findFunction fun fenv) of
+      case findFunction fun fenv of
         Just (Function xs body) -> do
           argVs <- evaluateArgs args []
           let newEnv = zip (map fst xs) argVs
@@ -109,7 +107,8 @@ evaluate e env fenv = evalState [] $ eval e env
             evaluateArgs xs (vs ++ [v])
 
                                         
-        _ -> return (RaiseV (IntV 1))
+        _ -> eval (CallFC (Var fun) (args !! 0)) env
+    
     eval (Lit n) _ = return n
     
     eval (Unary op ex) env = do

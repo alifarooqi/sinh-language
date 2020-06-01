@@ -1,4 +1,0 @@
-var x : Bool = mutable true;
-var y : Bool = mutable false;
-y <- true;
-$y && $x

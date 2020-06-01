@@ -1,4 +1,15 @@
 :q
+:l demo5.txt 
+:l demo5.txt 
+:l demo5.txt 
+:l demo5.txt 
+:l demo5.txt 
+:l demo5.txt 
+:l demo5.txt 
+var x : String = "Hello "; var y : String = "World"; x
+var x : String = "Hello "; var y : String = "World";  x
+var x : String = "Hello "; var y : String = "World";  y
+:q
 :l demo9.txt 
 :q
 :l demo9.txt 
@@ -87,14 +98,3 @@ var x : String = "Hello "; var y : Int = 100; y + x
 var x : String = "Hello "; var y : Int = 100; y + x
 var x : String = "Hello "; var y : Int = 100; y
 :q
-var x : String = "Hello "; var y : Int = 100; y
-var x : String = "Hello "; var y : Int = 100; x
-var x : String = "Hello "; var y : String = "World"; x
-:q
-var x : Int = 1; var y : Int = 4; x + y
-var x : Int = 1; var y : Int = 4; x
-var x : String = "Hello "; var y : String = "World"; x
-"He;llo" + "bachay"
-"He;llo bachay"
-"He;llo"
-var x : String = "Hello "; var y : String = "World"; x + "asd"

@@ -105,7 +105,6 @@ tRcd1 : id ':' typ       { ($1, $3) }
 
 Exp : fun '(' id ':' typ ')' '{' Exp '}'   { Fun ($3, $5) $8 }
     | var id ':' typ '=' Exp ';' Exp       { Decl $2 $4 $6 $8 }
---    | Exp ';' Exp                          { Seq $1 $3 }
     | id '<-' Exp ';' Exp                  { Assign (Var $1) $3 $5 }
     | if '(' Exp ')' Exp ';' else Exp      { If $3 $5 $8 }
     | Exp '||' Exp                         { Bin Or $1 $3 }
@@ -144,13 +143,14 @@ Rcd1 : id '=' Exp   { ($1, $3) }
      | id '=' Exp ','   { ($1, $3) }
 
 
-App : App '(' Exp ')'                    { CallFC $1 $3 }
+App : App '(' Exp ')'                    { CallFC $1 $3 } -- Redundant
+    | id '(' Exps ')'                    { Call $1 $3 }
     | '(' Exp ')'                        { $2 }
     | int                                { Lit (IntV $1) }
     | true                               { Lit (BoolV True) }
     | false                              { Lit (BoolV False) }
     | string                             { Lit (StringV $1) }
-    | id                                 { Var $1}
+    | id                                 { Var $1 }
 
 Exps : Exps ',' Exp                   { $1 ++ [$3] }
      | Exp                            { [$1] }

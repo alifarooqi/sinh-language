@@ -79,11 +79,9 @@ data Exp = Lit Value
          | CaseV Exp [(String, String, Exp)]   -- added
          | Raise Exp                           -- added
          | Try Exp Exp                         -- added
-         -- | Seq Exp Exp          -- new
          | Mutable Exp          -- new
          | Access Exp           -- new
          | Assign Exp Exp Exp      -- new
-
          deriving Eq
 
 -- <Implementing Mutable Variables>
