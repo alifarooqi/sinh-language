@@ -176,7 +176,6 @@ tcheck typeEnv (If e1 e2 e3) tenv fenv =
     Right te -> Left $ "Type Error: The condition in if statement is not boolean.\n Expected: Bool, got " ++ show te ++ " at\n" ++ show (If e1 e2 e3)
     err -> err
     
-
 tcheck typeEnv (Var v) tenv _ = case lookup v tenv of
   Just t -> Right t
   Nothing -> Left $ "Variable " ++ v ++ " is not declared"
@@ -189,6 +188,20 @@ tcheck typeEnv (Decl v t e1 e2) tenv fenv =
         Nothing -> Left $ "Type " ++ str ++ " has not been declared")
     _              -> do t1 <- tcheck typeEnv e1 tenv fenv
                          tcheck typeEnv e2 ((v, t) : tenv) fenv
+
+tcheck typeEnv (Mutable e) tenv fenv = do
+  t <- tcheck typeEnv e tenv fenv
+  Right $ TMutable t
+
+tcheck typeEnv (Access e) tenv fenv = tcheck typeEnv e tenv fenv
+
+tcheck typeEnv (Assign e1 e2 e3) tenv fenv = do
+  t1 <- tcheck typeEnv e1 tenv fenv
+  t2 <- tcheck typeEnv e2 tenv fenv
+  if t1 == t2 then 
+    tcheck typeEnv e3 tenv fenv 
+  else 
+    Left $ "Cannot assign " ++ show t2 ++ " to a mutable of type " ++ show t2
 
 
 checkProgram :: Program -> Either String Type
