@@ -3,16 +3,19 @@ module Declare where
 import Data.Maybe (fromJust)
 import Data.List (intercalate, intersect)
 import Prelude hiding (LT, GT, EQ)
+import Control.Monad (ap, liftM)
 
 -- import Debug.Trace (trace)
 
--- Colors
+
+
+-- Colors and debugging
 colorReset = "\x1b[0m"
 debugColor = "\x1b[36m"
 red = "\x1b[31m"
 yellow = "\x1b[33m"
 
-debug p = (debugColor ++ "Debug: " ++ show p ++ colorReset)
+debug p = (debugColor ++ show p ++ colorReset)
 
 data BinaryOp = Add | Sub | Mult | Div
               | And | Or  | GT   | LT  | LE
@@ -34,7 +37,7 @@ data Value
   | VarntV String Value Type               -- added
   | RaiseV Value                           -- added
   | StringV String
-  -- | IO(Value)
+  | AddressV Int        -- new
   deriving Eq
 
 data Type
@@ -44,7 +47,8 @@ data Type
   | TRcd [(String,Type)]             -- added
   | TVarnt [(String,Type)]           -- added
   | TypDecl String                   -- added
-  | TString
+  | TString             -- new
+  | TMutable Type
   -- deriving Eq
 
 --data Declr = FunDecl (String, Function)
@@ -75,7 +79,38 @@ data Exp = Lit Value
          | CaseV Exp [(String, String, Exp)]   -- added
          | Raise Exp                           -- added
          | Try Exp Exp                         -- added
+         -- | Seq Exp Exp          -- new
+         | Mutable Exp          -- new
+         | Access Exp           -- new
+         | Assign Exp Exp Exp      -- new
+
          deriving Eq
+
+-- <Implementing Mutable Variables>
+
+data Stateful t = ST (Memory -> (t, Memory))
+
+instance Monad Stateful where
+  return val = ST (\m -> (val, m))
+  (ST c) >>= f =
+    ST
+      (\m -> let (val, m') = c m
+                 ST f' = f val
+             in f' m')
+
+type Memory = [Value]
+
+-- Make GHC 7.10 happy
+instance Functor Stateful where
+  fmap = liftM
+
+instance Applicative Stateful where
+  pure = return
+  (<*>) = ap
+
+
+-- </Implementing Mutable Variables>
+
 
 prog1 :: Program
 prog1 =
@@ -98,6 +133,7 @@ instance Show Type where
   show (TVarnt xs)  = "<" ++ intercalate ", " (map (\(key, t) -> key ++ ": " ++ show t) xs) ++ ">"
   show (TypDecl str) = str
   show (TString) = "String"
+  show (TMutable a) = "Mutable " ++ show a
 
 instance Show Value where
   show (IntV n) = show n
@@ -112,7 +148,9 @@ instance Show Value where
       (IntV 1) -> "Function not declared!" -- Redundant: Chacked during typecheck
       (IntV 2) -> "Variable not declared!" -- Redundant: Chacked during typecheck
       (IntV 3) -> "Record not declared!"   -- Redundant: Chacked during typecheck
+      (StringV msg) -> msg
   show (StringV str) = str
+  show (AddressV n) = show $ "Address: " ++ show n
 
 instance Eq Type where
   TInt == TInt = True
@@ -122,7 +160,11 @@ instance Eq Type where
   TVarnt a == TVarnt b = not $ null $ intersect a b
   TypDecl a == TypDecl b = a == b
   TString == TString = True
+  TMutable a == TMutable b = a == b
+  TMutable a == b = a == b
+  a == TMutable b = a == b
   _ == _ = False
+
 
 -- | Examples:
 --
@@ -184,6 +226,10 @@ instance Show Exp where
   show = showExp 0
 
 showExp :: Int -> Exp -> String
+-- showExp _ (Seq e1 e2) = show e1 ++ ";\n" ++ show e2
+showExp _ (Mutable e) = show e
+showExp _ (Access e) = show e
+showExp _ (Assign e1 e2 e3) = show e1 ++ " <- " ++ show e2 ++ ";\n" ++ show e3
 showExp _ (Try exp1 exp2) = "try " ++ show exp1 ++ " with " ++ show exp2
 showExp _ (Raise exp) = show exp
 showExp _ (CaseV exp xs) = showCaseV exp xs
@@ -288,4 +334,5 @@ e1 :: Exp
 e1 = Rcd [("age", Lit(IntV(23)))]
 e2 :: Exp
 e2 = RcdProj e1 "age"
+
 

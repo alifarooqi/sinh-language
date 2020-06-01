@@ -1,0 +1,4 @@
+var x = mutable 3;
+var y = mutable 7;
+x = @x + @y;
+y = @y * @x
