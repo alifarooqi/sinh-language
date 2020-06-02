@@ -8,4 +8,6 @@ stack exec sinh demo5.txt
 stack exec sinh demo6.txt
 stack exec sinh demo7.txt
 stack exec sinh demo8.txt
+stack exec sinh demo9.txt
+stack exec sinh demo10.txt
 stack exec sinh fact.txt

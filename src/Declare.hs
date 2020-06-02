@@ -48,7 +48,7 @@ data Type
   | TVarnt [(String,Type)]           -- added
   | TypDecl String                   -- added
   | TString             -- new
-  | TMutable Type
+  | TMutable Type       -- new
   -- deriving Eq
 
 --data Declr = FunDecl (String, Function)
@@ -79,8 +79,8 @@ data Exp = Lit Value
          | CaseV Exp [(String, String, Exp)]   -- added
          | Raise Exp                           -- added
          | Try Exp Exp                         -- added
-         | Mutable Exp          -- new
-         | Access Exp           -- new
+         | Mutable Exp             -- new
+         | Access Exp              -- new
          | Assign Exp Exp Exp      -- new
          deriving Eq
 
@@ -153,7 +153,9 @@ instance Show Value where
 instance Eq Type where
   TInt == TInt = True
   TBool == TBool = True
-  TFun a1 b1 == TFun a2 b2 = a1 == a2 && b1 == b2
+  TFun _ _ == TFun _ _ = True       -- Bug: Explained in the report
+  _        == TFun _ _ = True       -- Bug
+  TFun _ _ == _        = True       -- Bug
   TRcd a == TRcd b = a == b
   TVarnt a == TVarnt b = not $ null $ intersect a b
   TypDecl a == TypDecl b = a == b
@@ -232,7 +234,7 @@ showExp _ (Try exp1 exp2) = "try " ++ show exp1 ++ " with " ++ show exp2
 showExp _ (Raise exp) = show exp
 showExp _ (CaseV exp xs) = showCaseV exp xs
 showExp _ (Varnt str exp t) = "<" ++ str ++ "=" ++ (show exp) ++ " : " ++ (show t) ++ ">"
-showExp _ (RcdProj exp str) = showRcdProject exp str
+showExp _ (RcdProj exp str) = show exp ++ "." ++ str
 showExp _ (Rcd r) = "{" ++ intercalate ", " (map (\(key, v) -> key ++ ": " ++ show v) r) ++ "}"
 showExp _ (Fun (n, t) e) = "function(" ++ n ++ " : " ++ show t ++ ") {\n " ++ show e ++ "\n}"
 showExp _ (CallFC f arg) = show f ++ "(" ++ show arg ++ ")"
@@ -324,9 +326,6 @@ findFunction name ((typ, funName, function):xs) = if (name == funName) then Just
 findFunctionType :: String -> FunEnv -> Maybe Type
 findFunctionType name [] = Nothing
 findFunctionType name ((typ, funName, function):xs) = if (name == funName) then Just typ else findFunctionType name xs
-
-showRcdProject :: Exp -> String -> String
-showRcdProject (Rcd record) str = show $ fromJust $ lookup str record
 
 e1 :: Exp
 e1 = Rcd [("age", Lit(IntV(23)))]

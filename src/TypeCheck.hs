@@ -72,9 +72,9 @@ checkFunEnv typeEnv fds = checkFunEnv1 fds [] -- starts with an empty function t
 
 tcheck :: TypeEnv -> Exp -> TEnv -> TFunEnv -> Either String Type
 
-tcheck typeEnv (Try exp1 exp2) env fenv = case tcheck typeEnv exp1 env fenv of
-  (Right t) -> (Right t)
-  Left _ -> tcheck typeEnv exp2 env fenv
+tcheck typeEnv (Try exp1 exp2) env fenv = do
+  tcheck typeEnv exp2 env fenv
+  tcheck typeEnv exp1 env fenv
 
 tcheck typeEnv (Raise exp) env fenv = tcheck typeEnv exp env fenv
 
@@ -187,7 +187,10 @@ tcheck typeEnv (Decl v t e1 e2) tenv fenv =
         Just t2 -> tcheck typeEnv (Decl v t2 e1 e2) tenv fenv
         Nothing -> Left $ "Type " ++ str ++ " has not been declared")
     _              -> do t1 <- tcheck typeEnv e1 tenv fenv
-                         tcheck typeEnv e2 ((v, t) : tenv) fenv
+                         if t == t1 then
+                            tcheck typeEnv e2 ((v, t) : tenv) fenv
+                         else
+                            Left $ "Type of the variable " ++ show v ++ " don't match.\nExpected " ++ show t ++ ", got " ++ show t1
 
 tcheck typeEnv (Mutable e) tenv fenv = do
   t <- tcheck typeEnv e tenv fenv
