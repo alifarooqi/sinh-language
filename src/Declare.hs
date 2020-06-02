@@ -14,6 +14,7 @@ colorReset = "\x1b[0m"
 debugColor = "\x1b[36m"
 red = "\x1b[31m"
 yellow = "\x1b[33m"
+blue = "\x1b[35m"
 
 debug p = (debugColor ++ show p ++ colorReset)
 

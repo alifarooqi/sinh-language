@@ -1,6 +1,23 @@
 :q
-var x : String = "Hello "; var y : String = "World";  x+y
+:l demo10.txt 
+var x : String = "Hello "; var y : String = "World";  x
+:q
+var x : String = "Hello "; var y : String = "World";  x
+var x : String = "Hello "; var y : Int = 1; x+ y
 var x : String = "Hello "; var y : String = "World";  y
+"Hello" + "World"
+"happy birthday" + "lol"
+"happy birthday"
+:q
+:l demo.txt 
+:h
+:q
+:q
+:q
+:q
+var a = 2
+var a = absd
+5/0
 :q
 var x : {a : Int} = {a = false}; x.a
 :q
@@ -81,20 +98,3 @@ var x : String = "Hello"; var y : Int = 100; x+y
 false || true
 var x : String = "Hello "; var y : Int = 100; x+y
 var y : Int = 100; var x : String = "Hello "; x+y
-var x : String = "Hello "; var y : String = "World"; y
-:q
-var x : String = "Hello "; var y : String = "World"; y
-:q
-"He\"llo"
-var x : String = "Hello "; var y : String = "World"; y
-var x : String = "Hello "; var y : String = ""; y
-"asd" + 234
-"asd" + "asdw"
-var x : String = "Hello "; var y : String = ""; x+y
-var y : Int = 100; var x : String = "Hello "; x+y
-:q
-var y : Int = 100; var x : String = "Hello "; x+y
-var x : String = "Hello "; var y : Int = 100; x+y
-var x : String = "Hello "; var y : String = ""; x+y
-:q
-var x : String = "Hello "; var y : String = ""; x+y

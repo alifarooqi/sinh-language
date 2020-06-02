@@ -16,7 +16,7 @@ import Tokens
     var     { TokenVar }
     id      { TokenSym $$ }
     int     { TokenInt $$ }
-    '"'     { TokenString }
+    str     { TokenString $$ }
     Int     { TokenTInt }
     Bool    { TokenTBool }
     String  { TokenTString }
@@ -149,7 +149,7 @@ App : App '(' Exp ')'                    { CallFC $1 $3 } -- Redundant
     | int                                { Lit (IntV $1) }
     | true                               { Lit (BoolV True) }
     | false                              { Lit (BoolV False) }
-    | '"' id '"'                         { Lit (StringV $2) }
+    | str                                { Lit (StringV $1) }
     | id                                 { Var $1 }
 
 Exps : Exps ',' Exp                   { $1 ++ [$3] }

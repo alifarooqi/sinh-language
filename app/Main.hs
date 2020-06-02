@@ -90,7 +90,7 @@ defaultMatcher = [(":load"  , fileCompleter), (":l"  , fileCompleter)]
 -- Default tab completer
 comp :: Monad m => WordCompleter m
 comp n = do
-  let cmds = [":load", ":quit"]
+  let cmds = [":load", ":quit", ":help"]
   return $ filter (isPrefixOf n) cmds
 
 
@@ -107,7 +107,7 @@ completer :: CompleterStyle IO
 completer = Prefix (wordCompleter comp) defaultMatcher
 
 banner :: Repl String
-banner = pure "sinh>> "
+banner = pure $ blue ++ "sinh>> " ++ colorReset
 
 ini :: Repl ()
 ini = do

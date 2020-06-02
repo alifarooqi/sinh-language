@@ -24,7 +24,7 @@ tokens :-
   type                          { \s -> TokenType }
   \|                            { \s -> TokenBar }
   $digit+                       { \s -> TokenInt (read s) }
-  \"                            { \s -> TokenString }
+  \".*\"                        { \s -> TokenString (read s) }
   \<\-                          { \s -> TokenAssign }
   \;                            { \s -> TokenSemiColon }
   \=                            { \s -> TokenEq }
@@ -65,7 +65,7 @@ tokens :-
 {
 -- The token type:
 data Token = TokenInt Int
-           | TokenString
+           | TokenString String
            | TokenSym String
            | TokenVar
            | TokenIf
