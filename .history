@@ -1,4 +1,8 @@
 :q
+:q
+var x : String = "Hello "; var y : String = "World";  x + y
+var x : String = "Hello "; var y : String = "World";  x
+:q
 :l demo10.txt 
 var x : String = "Hello "; var y : String = "World";  x
 :q
@@ -94,7 +98,3 @@ var x : String = "Hello"; var y : String = "World"; y
 var x : String = "Hello"; var y : String = "World"; y
 :q
 var x : String = "Hello"; var y : String = "World"; y
-var x : String = "Hello"; var y : Int = 100; x+y
-false || true
-var x : String = "Hello "; var y : Int = 100; x+y
-var y : Int = 100; var x : String = "Hello "; x+y

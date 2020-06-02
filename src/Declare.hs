@@ -11,10 +11,10 @@ import Control.Monad (ap, liftM)
 
 -- Colors and debugging
 colorReset = "\x1b[0m"
-debugColor = "\x1b[36m"
+debugColor = "\x1b[35m"
 red = "\x1b[31m"
 yellow = "\x1b[33m"
-blue = "\x1b[35m"
+blue = "\x1b[36m"
 
 debug p = (debugColor ++ show p ++ colorReset)
 

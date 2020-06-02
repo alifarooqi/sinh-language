@@ -47,11 +47,12 @@ tbinary EQ  t1  t2
 tbinary _ _ _ = Left "Type Error: Wrong type used with Binary Operator" -- Redundant
 
 
-substituteType :: (String, Type) -> TypeEnv -> Either String (String, Type)
-substituteType (name, (TypDecl str)) typeEnv = case lookup str typeEnv of
-  Just t -> Right (name, t)
-  Nothing -> Left $ "Undeclared type: " ++ str
-substituteType a _ = Right a
+substituteType :: TypeEnv ->(String, Type) ->  Either String (String, Type)
+substituteType typeEnv (name, (TypDecl str)) = 
+  case lookup str typeEnv of
+    Just t -> Right (name, t)
+    Nothing -> Left $ "Undeclared type: " ++ str
+substituteType _ a = Right a
 
 checkFunEnv :: TypeEnv -> FunEnv -> Either String TFunEnv
 checkFunEnv typeEnv fds = checkFunEnv1 fds [] -- starts with an empty function type environment
@@ -59,8 +60,8 @@ checkFunEnv typeEnv fds = checkFunEnv1 fds [] -- starts with an empty function t
     checkFunEnv1 :: FunEnv -> TFunEnv -> Either String TFunEnv
     checkFunEnv1 [] fenv = Right fenv
     checkFunEnv1 ((typ, name, Function paras body):fs) fenv = do
-      (_, typ') <- substituteType ("", typ) typeEnv -- Substitute return type
-      let paras' = [ substituteType p typeEnv | p <- paras ] -- Substitute parameters' type
+      (_, typ') <- substituteType typeEnv ("", typ)  -- Substitute return type
+      let paras' = [ substituteType typeEnv p | p <- paras ] -- Substitute parameters' type
       let n = lefts paras'
       if (length n) > 0 then 
         Left $ head n
@@ -69,6 +70,13 @@ checkFunEnv typeEnv fds = checkFunEnv1 fds [] -- starts with an empty function t
         t <- tcheck typeEnv body newParas ((name, (newParas, typ')) : fenv)
         checkFunEnv1 fs ((name, (newParas, t)) : fenv)
 
+extractRights :: [Either a b] -> Either a [b]
+extractRights xs = do
+  let n = lefts xs
+  if (length n) == 0 then 
+    Right (rights xs)
+  else
+    Left $ head n
 
 tcheck :: TypeEnv -> Exp -> TEnv -> TFunEnv -> Either String Type
 
@@ -112,12 +120,10 @@ tcheck typeEnv (RcdProj exp str) env fenv = do
     te -> Left $ "Type Error: Projection seems to be done a variable of type " ++ show te
 
 tcheck typeEnv (Rcd xs) env fenv = do
-  let xxs = checkRcd xs
-  let n = lefts xxs
-  if (length n) == 0 then 
-    Right $ TRcd (rights xxs)
-  else
-    Left $ head n
+  xxs <- extractRights $ checkRcd xs
+  let s = map (substituteType typeEnv) xxs
+  ss <- extractRights s
+  Right $ TRcd ss
   where
     checkRcd :: [(String,Exp)] -> [Either String (String,Type)]
     checkRcd [] = []
@@ -210,4 +216,116 @@ tcheck typeEnv (Assign e1 e2 e3) tenv fenv = do
 checkProgram :: Program -> Either String Type
 checkProgram (Program typeEnv fds main) = do
   fenv <- checkFunEnv typeEnv fds
-  tcheck typeEnv main [] fenv
+  main' <- replaceTypeInExp typeEnv main
+  tcheck typeEnv main' [] fenv
+
+replaceTypeInExp :: TypeEnv -> Exp -> Either String Exp
+replaceTypeInExp typeEnv (Lit v) = Right $ Lit v
+replaceTypeInExp typeEnv (Unary op e) = do
+  e1 <- replaceTypeInExp typeEnv e
+  Right $ Unary op e1
+replaceTypeInExp typeEnv (Bin op e1 e2) = do
+  e3 <- replaceTypeInExp typeEnv e1
+  e4 <- replaceTypeInExp typeEnv e2
+  Right $ Bin op e3 e4
+replaceTypeInExp typeEnv (If e1 e2 e3) = do
+  e11 <- replaceTypeInExp typeEnv e1
+  e22 <- replaceTypeInExp typeEnv e2
+  e33 <- replaceTypeInExp typeEnv e3
+  Right $ If e11 e22 e33
+replaceTypeInExp typeEnv (Var v) = Right $ Var v
+replaceTypeInExp typeEnv (Decl v t e1 e2) = do
+  t1 <- replaceType typeEnv t
+  e3 <- replaceTypeInExp typeEnv e1
+  e4 <- replaceTypeInExp typeEnv e2
+  Right $ Decl v t1 e3 e4
+replaceTypeInExp typeEnv (Call v exps) = do
+  let m = (map (replaceTypeInExp typeEnv) exps)
+  xs <- extractRights m
+  Right $ Call v xs
+replaceTypeInExp typeEnv (CallFC e1 e2) = do
+  e3 <- replaceTypeInExp typeEnv e1
+  e4 <- replaceTypeInExp typeEnv e2
+  Right $ CallFC e3 e4
+replaceTypeInExp typeEnv (Fun (name, t) e) = do
+  t1 <- replaceType typeEnv t
+  e2 <- replaceTypeInExp typeEnv e
+  Right $ Fun (name, t1) e2
+replaceTypeInExp typeEnv (Rcd xs) = do
+  let m = (map (mapperFunc typeEnv) xs)
+  xss <- extractRights m
+  Right $ Rcd xss
+replaceTypeInExp typeEnv (RcdProj e key) = do
+  e2 <- replaceTypeInExp typeEnv e
+  Right $ RcdProj e2 key
+replaceTypeInExp typeEnv (Varnt n e t) = do
+  t1 <- replaceType typeEnv t
+  e2 <- replaceTypeInExp typeEnv e
+  Right $ Varnt n e2 t1
+replaceTypeInExp typeEnv (CaseV e xs) = do
+  e2 <- replaceTypeInExp typeEnv e
+  let m = (map (mapperFunc2 typeEnv) xs)
+  xss <- extractRights m
+  Right $ CaseV e2 xss
+replaceTypeInExp typeEnv (Raise e) = do
+  e2 <- replaceTypeInExp typeEnv e
+  Right $ Raise e2
+replaceTypeInExp typeEnv (Try e1 e2) = do
+  e3 <- replaceTypeInExp typeEnv e1
+  e4 <- replaceTypeInExp typeEnv e2
+  Right $ Try e3 e4
+replaceTypeInExp typeEnv (Mutable e) = do
+  e2 <- replaceTypeInExp typeEnv e
+  Right $ Mutable e2
+replaceTypeInExp typeEnv (Access e) = do
+  e2 <- replaceTypeInExp typeEnv e
+  Right $ Access e2
+replaceTypeInExp typeEnv (Assign e1 e2 e3) = do
+  e11 <- replaceTypeInExp typeEnv e1
+  e22 <- replaceTypeInExp typeEnv e2
+  e33 <- replaceTypeInExp typeEnv e3
+  Right $ Assign e11 e22 e33
+
+
+mapperFunc :: TypeEnv -> (String,Exp) -> Either String (String,Exp)
+mapperFunc typeEnv (s, e) = do
+  e1 <- replaceTypeInExp typeEnv e
+  Right $ (s, e1)
+
+mapperFunc2 :: TypeEnv -> (String, String,Exp) -> Either String (String, String,Exp)
+mapperFunc2 typeEnv (s1, s2, e) = do
+  e1 <- replaceTypeInExp typeEnv e
+  Right $ (s1, s2, e1)
+
+mapperFunc3 :: TypeEnv -> (String, Type) -> Either String (String, Type)
+mapperFunc3 typeEnv (s, t) = do
+  t1 <- replaceType typeEnv t
+  Right $ (s, t1)
+
+
+replaceType :: TypeEnv -> Type -> Either String Type
+replaceType typeEnv (TypDecl name) = do
+  case lookup name typeEnv of
+    Just t -> replaceType typeEnv t
+    _ -> Left $ "Type " ++ name ++ " has not been declared"
+replaceType typeEnv (TRcd xs) = do
+  let xss = map (mapperFunc3 typeEnv) xs
+  a <- extractRights xss
+  Right $ TRcd a
+replaceType typeEnv (TVarnt xs) = do
+  let xss = map (mapperFunc3 typeEnv) xs
+  a <- extractRights xss
+  Right $ TVarnt a
+replaceType typeEnv (TFun t1 t2) = do
+  t3 <- replaceType typeEnv t1
+  t4 <- replaceType typeEnv t2
+  Right $ TFun t3 t4
+replaceType _ a = Right a
+
+
+
+
+
+
+
+
