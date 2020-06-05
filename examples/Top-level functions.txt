@@ -2,3 +2,4 @@
 function Int absolute (x : Int) { if (x > 0) x; else -x }
 function Int max (x : Int, y : Int) { if (x > y) x; else y }
 @max(@absolute(-5), 4) -- Explicit call to top-level function
+-- Note: Above call is same as `max(absolute(-5), 4)`
