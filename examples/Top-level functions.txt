@@ -1,0 +1,4 @@
+-- Comments start with double hyphen
+function Int absolute (x : Int) { if (x > 0) x; else -x }
+function Int max (x : Int, y : Int) { if (x > y) x; else y }
+@max(@absolute(-5), 4) -- Explicit call to top-level function

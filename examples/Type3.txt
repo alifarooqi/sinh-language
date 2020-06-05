@@ -1,0 +1,4 @@
+type Person = {age : Int, name : String}
+type Car = {owner: Person, speed: Int}
+var john : Person = {age = 30, name = "John"}; 
+var honda : Car = {owner = john, speed = 1000}; honda.owner

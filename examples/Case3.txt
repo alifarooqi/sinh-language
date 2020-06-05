@@ -1,0 +1,3 @@
+case <age=30 : Int> of 
+| <age=x> => 1 + 2
+| <age1=y> => 1

@@ -1,0 +1,2 @@
+type Person = {age : Int, name : String}
+var john : Person = {age = 30, name = "John"}; john.name

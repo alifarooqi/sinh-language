@@ -1,0 +1,11 @@
+var x : Int = 5;
+var f : Int -> Int = function(foo : Int -> Int) {
+  foo(x)
+};
+var add : Int -> Int = function(x : Int) {
+  function(y : Int) {
+    x + y
+  }
+};
+var x : Int = 4;
+f(add(x))

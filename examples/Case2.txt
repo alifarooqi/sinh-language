@@ -1,0 +1,10 @@
+type Shape = <Circle : Int, Square : Int>
+
+function Bool isCircle (x : Shape)
+{
+	case x of 
+	| <Circle=diameter> => true
+	| <Square=length> => false
+}
+
+var myShape : Shape = <Square=30 : Int>; @isCircle(myShape)
